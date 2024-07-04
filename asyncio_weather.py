@@ -4,6 +4,9 @@ from aiohttp import ClientSession, web
 
 
 async def get_weather(city):
+    """Функция принимает название города в качестве аргумента,
+    делает запрос к API OpenWeatherMap и возвращает информацию
+    о текущей погоде в этом городе."""
     async with ClientSession() as session:
         url = f'http://api.openweathermap.org/data/2.5/weather'
         params = {'q': city, 'APPID': '2a4ff86f9aaa70041ec8e82db64abf56'}
@@ -13,10 +16,12 @@ async def get_weather(city):
             try:
                 return weather_json["weather"][0]["main"]
             except KeyError:
-                return 'Нет данных'
+                return 'Данные недоступны'
 
 
 async def get_translation(text, source, target):
+    """Функция принимает текст, язык источника и язык перевода,
+    делает запрос к API LibreTranslate и возвращает переведенный текст."""
     async with ClientSession() as session:
         url = 'https://libretranslate.de/translate'
 
@@ -31,7 +36,11 @@ async def get_translation(text, source, target):
                 return text
 
 
-async def handle(request):
+async def process_request(request):
+    """Функция-обработчик, получает запрос с параметром 'city' в URL,
+    переводит название города с русского на английский,
+    получает информацию о погоде и переводит ее с английского на русский,
+    а затем возвращает JSON-ответ с городом и погодой."""
     city_ru = request.rel_url.query['city']
     city_en = await get_translation(city_ru, 'ru', 'en')
 
@@ -44,8 +53,11 @@ async def handle(request):
 
 
 async def main():
+    """Функция создает веб-приложение на базе библиотеки aiohttp,
+    добавляет маршрут для обработки запросов к '/weather',
+    запускает сервер и ждет запросов."""
     app = web.Application()
-    app.add_routes([web.get('/weather', handle)])
+    app.add_routes([web.get('/weather', process_request)])
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, 'localhost', 8080)
