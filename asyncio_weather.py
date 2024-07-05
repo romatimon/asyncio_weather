@@ -9,7 +9,7 @@ async def get_weather(city):
     о текущей погоде в этом городе."""
     async with ClientSession() as session:
         url = f'http://api.openweathermap.org/data/2.5/weather'
-        params = {'q': city, 'APPID': '2a4ff86f9aaa70041ec8e82db64abf56'}
+        params = {'q': city, 'APPID': '3s5dd97g0sss81152rtv8r81fd543sbf67'}
 
         async with session.get(url=url, params=params) as response:
             weather_json = await response.json()
